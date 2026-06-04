@@ -1,0 +1,75 @@
+%PDF-1.4
+1 0 obj
+<</Type /Catalog /Pages 2 0 R>>
+endobj
+2 0 obj
+<</Type /Pages /Kids [3 0 R] /Count 1>>
+endobj
+3 0 obj
+<</Type /Page /Parent 2 0 R /Resources <<>> /MediaBox [0 0 612 792] /Contents 4 0 R>>
+endobj
+4 0 obj
+<</Length 2400>>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(ALEX RODRIGUEZ) Tj
+0 -25 Td
+(DevOps & Cloud Infrastructure Engineer) Tj
+0 -50 Td
+(Email: alex.rodriguez@email.com | Phone: +1-555-0103 | GitHub: github.com/alexrodriguez) Tj
+0 -40 Td
+(PROFESSIONAL SUMMARY) Tj
+0 -20 Td
+(3+ years of DevOps and cloud infrastructure experience with focus on CI/CD and automation.) Tj
+(Expert in containerization, orchestration, and infrastructure-as-code methodologies.) Tj
+(Strong background in monitoring, logging, and system reliability engineering.) Tj
+0 -40 Td
+(TECHNICAL SKILLS) Tj
+0 -20 Td
+(Cloud Platforms: AWS, Azure, Google Cloud Platform) Tj
+(Containerization: Docker, Kubernetes, Docker Compose) Tj
+(CI/CD Tools: Jenkins, GitLab CI, GitHub Actions) Tj
+(IaC: Terraform, CloudFormation, Ansible) Tj
+(Monitoring: Prometheus, Grafana, ELK Stack, DataDog) Tj
+(Scripting: Bash, Python, Go) Tj
+0 -40 Td
+(WORK EXPERIENCE) Tj
+0 -25 Td
+(DevOps Engineer | CloudSystems Inc | Feb 2021 - Present) Tj
+0 -20 Td
+(Managed Kubernetes clusters running 200+ microservices) Tj
+(Implemented automated CI/CD pipeline reducing deployment time by 80%) Tj
+(Built disaster recovery infrastructure with RTO of 15 minutes) Tj
+0 -40 Td
+(Infrastructure Engineer | WebScaleApp | Jun 2019 - Jan 2021) Tj
+0 -20 Td
+(Designed and deployed AWS infrastructure for 10M+ daily users) Tj
+(Implemented infrastructure-as-code using Terraform for AWS resources) Tj
+(Reduced infrastructure costs by 40% through optimization) Tj
+0 -40 Td
+(EDUCATION) Tj
+0 -25 Td
+(Bachelor of Science in Computer Engineering | Tech Institute | 2019) Tj
+0 -40 Td
+(CERTIFICATIONS) Tj
+0 -20 Td
+(Certified Kubernetes Administrator - CKA | 2023) Tj
+(AWS Certified Solutions Architect - Associate | 2022) Tj
+(HashiCorp Certified: Terraform Associate | 2021) Tj
+ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000203 00000 n
+trailer
+<</Size 5 /Root 1 0 R>>
+startxref
+2648
+%%EOF
