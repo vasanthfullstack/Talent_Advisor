@@ -6,12 +6,6 @@ import fitz
 
 logger = logging.getLogger(__name__)
 
-
-import fitz
-import logging
-
-logger = logging.getLogger(__name__)
-
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
     Extract text from PDF using PyMuPDF.

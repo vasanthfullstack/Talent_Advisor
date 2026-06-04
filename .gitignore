@@ -1,0 +1,5 @@
+env/
+app\__pycache__\
+app/__pycache__/
+app/rag/__pycache__/
+app/rag/__pycache__/
