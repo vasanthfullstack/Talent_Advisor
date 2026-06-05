@@ -96,16 +96,18 @@ class FAISSVectorStore:
         except Exception as e:
             logger.error(f"Failed to save index: {str(e)}")
     
-    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: int = 5, 
+               source_preference: str = None) -> List[Dict[str, Any]]:
         """
         Search for similar chunks using the query.
         
         Args:
             query: Query text
             top_k: Number of results to return
+            source_preference: Optional source type to prefer ('resume', 'media', or None for all)
             
         Returns:
-            List of most similar chunks with distances
+            List of most similar chunks with distances, preferring specified source if provided
         """
         if self.index is None or len(self.metadata) == 0:
             logger.warning("FAISS index is empty")
@@ -116,22 +118,45 @@ class FAISSVectorStore:
         query_embedding = np.array(query_embedding).astype('float32')
         
         # Search
-        distances, indices = self.index.search(query_embedding, min(top_k, len(self.metadata)))
+         # Retrieve more results than needed to ensure good filtering
+        search_top_k = min(top_k * 3, len(self.metadata)) if source_preference else min(top_k, len(self.metadata))
+        distances, indices = self.index.search(query_embedding, search_top_k)
         
         results = []
+        preferred_results = []
+        other_results = []
+
+
         for dist, idx in zip(distances[0], indices[0]):
             if idx >= 0:  # Valid index
                 metadata_entry = self.metadata[idx]
-                results.append({
+                chunk_data ={
                     'chunk_id': metadata_entry['chunk_id'],
                     'content': metadata_entry['content'],
                     'distance': float(dist),
                     'similarity_score': 1.0 / (1.0 + float(dist)),  # Convert distance to similarity
                     'metadata': metadata_entry['metadata']
-                })
+                }
         
-        logger.info(f"Retrieved {len(results)} chunks for query")
+                if source_preference:
+                    actual_source = metadata_entry.get('metadata', {}).get('source_type', 'unknown')
+                    if actual_source == source_preference:
+                        preferred_results.append(chunk_data)
+                    else:
+                        other_results.append(chunk_data)
+                else:
+                    results.append(chunk_data)
+        
+        # Combine results: preferred first, then others
+        if source_preference:
+            results = preferred_results + other_results
+        
+        # Return only top_k
+        results = results[:top_k]
+        
+        logger.info(f"Retrieved {len(results)} chunks for query (preference: {source_preference})")
         return results
+        
     
     def clear(self):
         """Clear the index."""

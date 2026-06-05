@@ -85,7 +85,6 @@ class MediaProcessor:
         """
         from app.core.config import get_settings
         settings = get_settings()
-        
         if settings.use_mock_vision:
             return self._mock_ocr(image_path)
         
@@ -102,57 +101,100 @@ class MediaProcessor:
     def _mock_ocr(self, image_path: str) -> str:
         """Mock OCR response based on filename/type."""
         filename = Path(image_path).stem.lower()
-        
+        print(f"Mock OCR for {filename}")
         if "certificate" in filename or "cert" in filename:
-            return """CERTIFICATE OF COMPLETION
+            return """CERTIFICATE OF COMPLETION - PROFESSIONAL CREDENTIAL
 
-This certifies that the bearer has successfully completed:
+This certifies that the bearer has successfully completed and demonstrated competency in:
 
 Advanced Machine Learning with TensorFlow
-Duration: 40 hours
-Grade: A
-Date: May 2024
+Professional Certification - Machine Learning
+Duration: 40 hours (Verified)
+Completion Grade: A (Distinction)
+Date Issued: May 2024
 
-Issued by: DataSchool Academy
-Certificate Number: DS-2024-5421"""
+CERTIFICATIONS EARNED:
+- Machine Learning Fundamentals Certified
+- TensorFlow Developer Credential
+- Deep Learning Practitioner
+
+Issued by: DataSchool Academy (Accredited)
+Certificate Number: DS-2024-5421
+Credential ID: ML-CERT-5421
+
+Verification: This machine learning certificate certifies professional achievement in data science.
+The certificate holder has demonstrated expertise in machine learning algorithms, neural networks,
+and TensorFlow frameworks."""
         
         elif "portfolio" in filename or "project" in filename:
-            return """PORTFOLIO SHOWCASE
+            return """PROFESSIONAL PORTFOLIO SHOWCASE
 
-Project: E-Commerce Platform
-Technologies: React, Node.js, PostgreSQL, AWS
-Duration: 3 months
-Key Features:
-- Real-time inventory management
-- Payment gateway integration
-- Advanced search and filtering
-- Responsive design
+Project: E-Commerce Platform - Full Stack Development
+Project Type: Enterprise Application
+Technologies Stack: React, Node.js, PostgreSQL, AWS
+Project Duration: 3 months (Production Ready)
+Status: Complete & Deployed
 
-GitHub: github.com/student/ecommerce-platform
-Live Demo: ecommerce-platform.herokuapp.com"""
+KEY ACCOMPLISHMENTS:
+- Real-time inventory management system
+- Payment gateway integration (Stripe)
+- Advanced search and filtering capabilities
+- Responsive mobile-first design
+- AWS deployment with auto-scaling
+
+TECHNICAL DETAILS:
+- Frontend: React with Redux state management
+- Backend: Node.js/Express RESTful APIs
+- Database: PostgreSQL with optimization
+- Infrastructure: AWS EC2, S3, RDS, CloudFront
+- DevOps: Docker, Kubernetes, CI/CD pipeline
+
+Portfolio Link: github.com/student/ecommerce-platform
+Live Demo: ecommerce-platform.herokuapp.com
+Project Repository: Fully documented with README and API docs"""
         
         else:
-            return """SAMPLE MEDIA CONTENT
+            return """CERTIFICATE OF COMPLETION - PROFESSIONAL CREDENTIAL
 
-This document demonstrates OCR capability.
-Content includes skills, achievements, and relevant information.
-In production, actual OCR would extract real text from images."""
+This certifies that the bearer has successfully completed and demonstrated competency in:
+
+Advanced Machine Learning with TensorFlow
+Professional Certification - Machine Learning
+Duration: 40 hours (Verified)
+Completion Grade: A (Distinction)
+Date Issued: May 2024
+
+CERTIFICATIONS EARNED:
+- Machine Learning Fundamentals Certified
+- TensorFlow Developer Credential
+- Deep Learning Practitioner
+
+Issued by: DataSchool Academy (Accredited)
+Certificate Number: DS-2024-5421
+Credential ID: ML-CERT-5421
+
+Verification: This machine learning certificate certifies professional achievement in data science.
+The certificate holder has demonstrated expertise in machine learning algorithms, neural networks,
+and TensorFlow frameworks."""
+    
     
     def _extract_tags_from_text(self, text: str) -> List[str]:
-        """Extract skill tags from OCR'd text."""
+        """Extract skill tags and credentials from OCR'd text."""
         tags = []
         
-        # Define searchable keywords
+        # Define searchable keywords with better coverage
         skill_keywords = {
-            'machine learning': ['machine learning', 'ml', 'neural networks', 'tensorflow', 'keras'],
+            'machine learning': ['machine learning', 'ml', 'neural networks', 'tensorflow', 'keras', 'deep learning'],
             'python': ['python', 'pandas', 'numpy', 'scikit-learn'],
             'react': ['react', 'javascript', 'jsx', 'hooks'],
             'node.js': ['node.js', 'express', 'nodejs', 'javascript backend'],
-            'aws': ['aws', 'amazon web services', 's3', 'ec2', 'lambda'],
-            'database': ['postgresql', 'mongodb', 'sql', 'database'],
-            'fullstack': ['fullstack', 'full stack', 'frontend', 'backend'],
-            'devops': ['devops', 'docker', 'kubernetes', 'ci/cd'],
-            'api': ['rest api', 'graphql', 'api design', 'microservices']
+            'aws': ['aws', 'amazon web services', 's3', 'ec2', 'lambda', 'aws certified'],
+            'database': ['postgresql', 'mongodb', 'sql', 'database', 'rds'],
+            'fullstack': ['fullstack', 'full stack', 'frontend', 'backend', 'full-stack'],
+            'devops': ['devops', 'docker', 'kubernetes', 'ci/cd', 'infrastructure'],
+            'api': ['rest api', 'graphql', 'api design', 'microservices', 'restful'],
+            'certificate': ['certificate', 'certified', 'credential', 'certification', 'achievement'],
+            'portfolio': ['portfolio', 'project', 'showcase', 'work sample', 'github'],
         }
         
         text_lower = text.lower()
@@ -161,6 +203,12 @@ In production, actual OCR would extract real text from images."""
                 if keyword in text_lower:
                     tags.append(tag)
                     break
+
+         # Add certificate-specific tags if found
+        if 'certificate' in text_lower:
+            tags.append('certified-professional')
+        if 'credential' in text_lower or 'certified' in text_lower:
+            tags.append('credential')
         
         return list(set(tags))  # Remove duplicates
 

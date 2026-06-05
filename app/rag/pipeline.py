@@ -78,11 +78,19 @@ class RAGPipeline:
             search_query = f"{question} {job_description}"
         
         # Retrieve relevant chunks
+        # Detect if query is about certificates/media
+        certificate_keywords = ['certificate', 'cert', 'portfolio', 'achievement', 'award', 
+                               'credential', 'media', 'screenshot', 'document', 'proof']
+        is_certificate_query = any(keyword in question.lower() for keyword in certificate_keywords)
+        source_preference = 'media' if is_certificate_query else None
+
         retrieved_chunks = self.vector_store.search(
             search_query, 
-            top_k=self.settings.top_k_retrieval
+            top_k=self.settings.top_k_retrieval,
+            source_preference=source_preference
         )
         metrics.retrieval_time = 0.1  # Mock timing
+        
         
         if not retrieved_chunks:
             return RAGResponse(
@@ -92,8 +100,13 @@ class RAGPipeline:
             )
         
         # Generate grounded answer from retrieved chunks
-        answer = self._generate_grounded_answer(question, retrieved_chunks, job_description)
-        
+        answer = self._generate_grounded_answer(
+            question, 
+            retrieved_chunks, 
+            job_description,
+            is_certificate_query=is_certificate_query
+        )
+
         # Convert to RAGChunk models
         cited_chunks = [
             RAGChunk(
@@ -115,7 +128,8 @@ class RAGPipeline:
         )
     
     def _generate_grounded_answer(self, question: str, chunks: List[Dict[str, Any]], 
-                                   job_description: Optional[str] = None) -> str:
+                                  job_description: Optional[str] = None,
+                                  is_certificate_query: bool = False) -> str:
         """
         Generate a grounded answer from retrieved chunks.
         
@@ -126,20 +140,58 @@ class RAGPipeline:
         
         # Extract relevant information from chunks
         students_mentioned = {}
+        media_chunks = []
+        resume_chunks = []
+
         for chunk in chunks:
             student_id = chunk['metadata']['student_id']
+            source_type = chunk['metadata'].get('source_type', 'unknown')
             if student_id not in students_mentioned:
-                students_mentioned[student_id] = []
-            students_mentioned[student_id].append(chunk['content'][:200])
+                students_mentioned[student_id] = {'resume': [], 'media': []}
+            
+            chunk_preview = chunk['content'][:150]
+            
+            if source_type == 'media':
+                students_mentioned[student_id]['media'].append(chunk_preview)
+                media_chunks.append((student_id, chunk_preview))
+            else:
+                students_mentioned[student_id]['resume'].append(chunk_preview)
+                resume_chunks.append((student_id, chunk_preview))
+                
         
         # Build answer
-        answer_parts = [f"Based on student profiles, here are relevant candidates:"]
-        for student_id, excerpts in students_mentioned.items():
-            answer_parts.append(f"\n• Student {student_id}:")
-            for excerpt in excerpts[:2]:
-                answer_parts.append(f"  - {excerpt}...")
+        if is_certificate_query and media_chunks:
+            # Prioritize certificate/media information
+            answer_parts = [f"Based on student certificates and portfolio materials, here are relevant candidates:"]
+            
+            for student_id, media_info in media_chunks:
+                answer_parts.append(f"\n• Student {student_id}:")
+                if students_mentioned[student_id]['media']:
+                    answer_parts.append("  [CERTIFICATE/PORTFOLIO]")
+                    for excerpt in students_mentioned[student_id]['media'][:2]:
+                        answer_parts.append(f"  - {excerpt}...")
+                if students_mentioned[student_id]['resume']:
+                    answer_parts.append("  [RESUME BACKGROUND]")
+                    for excerpt in students_mentioned[student_id]['resume'][:1]:
+                        answer_parts.append(f"  - {excerpt}...")
+        else:
+            # Default: Mix resume and media
+            answer_parts = [f"Based on student profiles and available documentation, here are relevant candidates:"]
+            
+            for student_id, data in students_mentioned.items():
+                answer_parts.append(f"\n• Student {student_id}:")
+                
+                # Show resume info
+                for excerpt in data['resume'][:2]:
+                    answer_parts.append(f"  - {excerpt}...")
+                
+                # Show media info if available
+                if data['media']:
+                    answer_parts.append("  [Credentials/Portfolio]")
+                    for excerpt in data['media'][:1]:
+                        answer_parts.append(f"  - {excerpt}...")
         
         if job_description:
-            answer_parts.append(f"\nFor the role requirement: {job_description[:100]}...")
+            answer_parts.append(f"\nMatching against role requirement: {job_description[:100]}...")
         
         return "\n".join(answer_parts)
